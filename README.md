@@ -39,6 +39,11 @@ brew trust --cask DiegoQueiroz/brlaser
 brew install --cask brlaser
 ```
 
+## Adding the printer
+
+Open System Settings > Printers & Scanners, click Add Printer, and look for
+entries marked with `brlaser`.
+
 ## Upgrading
 
 ```sh
@@ -66,6 +71,6 @@ for the current model list.
 ## Credits
 
 - Original driver: Peter De Wachter ([pdewacht/brlaser](https://github.com/pdewacht/brlaser))
-- Active fork packaged here: [Owl-Maintain/brlaser](https://github.com/Owl-Maintain/brlaser))
+- Active fork packaged here: [Owl-Maintain/brlaser](https://github.com/Owl-Maintain/brlaser)
 - Homebrew packaging for macOS inspired by the
   [ws/homebrew-brlaser](https://github.com/ws/homebrew-brlaser) tap
