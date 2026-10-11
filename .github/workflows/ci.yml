@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    name: Syntax and audit
+    runs-on: macos-26
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@e99025eb970cfa124b8284a35463d87426917478 # 2026.09.28.1
+
+      - name: Check style
+        run: brew style DiegoQueiroz/brlaser
+
+      - name: Check the tap loads
+        run: brew readall --aliases --os=all --arch=all DiegoQueiroz/brlaser
+
+      - name: Audit the cask
+        run: brew audit --cask --online --tap=DiegoQueiroz/brlaser
+
+  install-smoke:
+    name: Install and uninstall smoke test
+    runs-on: macos-26
+    needs: syntax
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@e99025eb970cfa124b8284a35463d87426917478 # 2026.09.28.1
+
+      - name: Install the cask
+        run: brew install --cask DiegoQueiroz/brlaser/brlaser
+
+      - name: Check what the install created
+        run: |
+          set -euo pipefail
+          ppd_dir="/Library/Printers/PPDs/Contents/Resources"
+          manifest="$ppd_dir/.brlaser-installed-ppds"
+
+          test -x /usr/libexec/cups/filter/rastertobrlaser
+          test -f "$manifest"
+
+          # Not pinned to the current upstream printer list: the point is a
+          # non-empty, self-consistent install, not a fixed model count.
+          listed="$(wc -l < "$manifest" | tr -d ' ')"
+          test "$listed" -ge 50
+
+          missing=0
+          while IFS= read -r ppd; do
+            if [ ! -f "$ppd_dir/$ppd" ]; then
+              echo "missing installed PPD: $ppd"
+              missing=$((missing + 1))
+            fi
+          done < "$manifest"
+          test "$missing" -eq 0
+
+          # Keep the list for the post-uninstall check, which must remove
+          # exactly these files, including any whose name is not br*.ppd.
+          cp "$manifest" /tmp/installed-ppds.txt
+          echo "install smoke test passed: $listed PPDs and the CUPS filter are in place"
+
+      - name: Uninstall the cask
+        run: brew uninstall --cask DiegoQueiroz/brlaser/brlaser
+
+      - name: Check the uninstall cleaned up
+        run: |
+          set -euo pipefail
+          ppd_dir="/Library/Printers/PPDs/Contents/Resources"
+
+          test ! -e /usr/libexec/cups/filter/rastertobrlaser
+          test ! -e "$ppd_dir/.brlaser-installed-ppds"
+
+          leftovers=0
+          while IFS= read -r ppd; do
+            if [ -e "$ppd_dir/$ppd" ]; then
+              echo "left behind by uninstall: $ppd"
+              leftovers=$((leftovers + 1))
+            fi
+          done < /tmp/installed-ppds.txt
+          test "$leftovers" -eq 0
+
+          echo "uninstall smoke test passed: filter, manifest and every installed PPD are gone"

@@ -5,7 +5,7 @@ cask "brlaser" do
   version "6.2.8"
   sha256 "16dae855aa7fff0eef0c05398fab37678243d7d610fa5f9af0d3a2cc9bf08cb0"
 
-  url "https://github.com/Owl-Maintain/brlaser/archive/refs/tags/v6.2.8.tar.gz"
+  url "https://github.com/Owl-Maintain/brlaser/archive/refs/tags/v#{version}.tar.gz"
   name "brlaser"
   desc "CUPS driver for Brother laser printers"
   homepage "https://github.com/Owl-Maintain/brlaser"
