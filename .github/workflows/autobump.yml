@@ -45,7 +45,7 @@ jobs:
           if [[ -n "${CASKS-}" ]]; then
             xargs "${BREW_BUMP[@]}" <<<"${CASKS}"
           else
-            "${BREW_BUMP[@]}" --auto --tap=DiegoQueiroz/brlaser
+            xargs "${BREW_BUMP[@]}" --tap=diegoqueiroz/brlaser < .github/autobump.txt
           fi
 
       - name: Enable auto-merge on bump PRs
