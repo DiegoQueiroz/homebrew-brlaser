@@ -35,7 +35,7 @@ Run the three commands below in order, as a single step:
 
 ```sh
 brew tap DiegoQueiroz/brlaser
-brew trust diegoqueiroz/brlaser
+brew trust DiegoQueiroz/brlaser
 brew install --cask brlaser
 ```
 
