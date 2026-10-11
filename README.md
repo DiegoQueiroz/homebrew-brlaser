@@ -35,14 +35,14 @@ Run the three commands below in order, as a single step:
 
 ```sh
 brew tap DiegoQueiroz/brlaser
-brew trust --cask DiegoQueiroz/brlaser
+brew trust diegoqueiroz/brlaser
 brew install --cask brlaser
 ```
 
 ## Adding the printer
 
-Open System Settings > Printers & Scanners, click Add Printer, and look for
-entries marked with `brlaser`.
+Open System Settings > Printers & Scanners, click "Add Printer, Scanner, or
+Fax...", and look for entries marked with `brlaser`.
 
 ## Upgrading
 
