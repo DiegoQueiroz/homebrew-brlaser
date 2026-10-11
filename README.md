@@ -39,7 +39,7 @@ brew trust diegoqueiroz/brlaser
 brew install --cask brlaser
 ```
 
-## Adding the printer
+### Adding the printer
 
 Open System Settings > Printers & Scanners, click "Add Printer, Scanner, or
 Fax...", and look for entries marked with `brlaser`.
