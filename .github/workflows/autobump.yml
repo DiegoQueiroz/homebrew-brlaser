@@ -16,6 +16,7 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   autobump:
@@ -47,6 +48,18 @@ jobs:
           else
             xargs "${BREW_BUMP[@]}" --tap=DiegoQueiroz/brlaser < .github/autobump.txt
           fi
+
+      - name: Run CI on bump PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # A pull request opened with GITHUB_TOKEN does not trigger the
+          # pull_request event, so ci.yml would never run on its own here and
+          # required checks would wait forever. workflow_dispatch is one of the
+          # events GITHUB_TOKEN may still raise, so ask for the run directly.
+          for branch in $(gh pr list --repo "$GITHUB_REPOSITORY" --state open --author "app/github-actions" --json headRefName -q '.[].headRefName'); do
+            gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$branch" || true
+          done
 
       - name: Enable auto-merge on bump PRs
         env:
